@@ -46,6 +46,9 @@ def resolve(dns_records,lookup_chain,domain)
         end
       end
   end
+  y="Error! record not found for #{domain}"
+  lookup_chain=[y]
+  return lookup_chain
 end
 
 # To complete the assignment, implement `parse_dns` and `resolve`.
