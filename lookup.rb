@@ -21,40 +21,33 @@ dns_raw = File.readlines("zone")
 def parse_dns(dns_raw)
   y=[]
   dns_raw.each do|x|
-    if x[0].include?("A") or x[0].include?("C")
-       y.push(x.split(","))
+    if x[0].include?("A") || x[0].include?("C")
+       y.push(x.strip.split(","))
     end
   end
-  h=[]
-  y.each do|i|
-    h.push([i[1].strip =>{:type => i[0].strip,:target =>i[2].strip}])
-  end
-  return h
+  h3 = Hash[y.map {|key, value1,value2| [value1.strip ,{:type=>key.strip,:target=>value2.strip}]}]
 end
 
 def resolve(dns_records,lookup_chain,domain)
-
-  dns_records.each do|a|
-      a.each do|x|
-        x.each do |k,v|
-          if k == domain and v[:type] == "A"
-            return lookup_chain.push(v[:target])
-          elsif k ==domain and v[:type] == "CNAME"
-            lookup_chain.push(v[:target])
-            resolve(dns_records,lookup_chain,v[:target])
-          end
-        end
-      end
+  record= dns_records[domain]
+  if (!record)
+    y= "Error: Record not found for #{domain}"
+    lookup_chain =[y]
+    return lookup_chain
+  elsif record[:type] == "CNAME"
+    lookup_chain<<record[:target]
+    resolve(dns_records,lookup_chain,record[:target])
+  elsif record[:type] == "A"
+    return lookup_chain<<record[:target]
   end
-  y="Error! record not found for #{domain}"
-  lookup_chain=[y]
-  return lookup_chain
 end
+
 
 # To complete the assignment, implement `parse_dns` and `resolve`.
 # Remember to implement them above this line since in Ruby
 # you can invoke a function only after it is defined.
 dns_records = parse_dns(dns_raw)
+#puts dns_records
 lookup_chain = [domain]
 lookup_chain = resolve(dns_records, lookup_chain, domain)
 puts lookup_chain.join(" => ")
