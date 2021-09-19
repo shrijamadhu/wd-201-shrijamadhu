@@ -28,12 +28,9 @@ class TodosList
   def initialize(todos)
     @todos = todos
   end
-
   def overdue
     TodosList.new(@todos.filter { |todo| todo.overdue? })
   end
-
-
   def due_today
     TodosList.new(@todos.filter { |todo| todo.due_today? })
   end
@@ -41,13 +38,10 @@ class TodosList
     TodosList.new(@todos.filter { |todo| todo.due_later? })
   end
   def add(todo)
-     @todos.push(todo)
+    @todos.push(todo)
   end
-
   def to_displayable_list
-     display_string=[]
-     @todos.each {|todo| display_string<< todo.to_displayable_string}
-     display_string
+    @todos.map{|todo| todo.to_displayable_string}.join("\n")
   end
 end
 
